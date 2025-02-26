@@ -29,11 +29,12 @@ jobs:
 
       - name: Коммит и пуш изменений
         run: |
-          git config --global user.name "RichardMoor75"
-          git config --global user.email "rishat.murtazin@gmail.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
           git add geosite.dat
           git commit -m "Автообновление geosite.dat" || exit 0
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          git push https://oauth2:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         continue-on-error: true  # Игнорируем ошибки, если изменений нет
+
