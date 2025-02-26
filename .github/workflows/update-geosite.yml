@@ -16,7 +16,7 @@ jobs:
         with:
           persist-credentials: false  # Отключаем стандартные креды
 
-      - name: Установка Python
+      - name: install Python
         uses: actions/setup-python@v3
         with:
           python-version: "3.x"
@@ -24,16 +24,19 @@ jobs:
       - name: Установка зависимостей
         run: pip install pyyaml requests
 
-      - name: Запуск скрипта
-        run: python script.py
-
-      - name: Коммит и пуш изменений
+      - name: Configure Git
         run: |
           git config --global user.name "RichardMoor75"
           git config --global user.email "rishat.murtazin@gmail.com"
+
+      - name: Run script
+        run: python script.py
+
+      - name: Commit and push changes
+        run: |
           git add geosite.dat
           git commit -m "Автообновление geosite.dat" || exit 0
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        continue-on-error: true  # Игнорируем ошибки, если изменений нет
+         # git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+      #  env:
+       #   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      #  continue-on-error: true  # Игнорируем ошибки, если изменений нет
