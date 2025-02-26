@@ -2,19 +2,20 @@ name: Update geosite.dat
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Запуск ежедневно в 00:00 UTC
-  workflow_dispatch:  # Возможность запустить вручную
+    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # Даём права на запись через GITHUB_TOKEN
+
     steps:
       - name: Checkout репозиторий
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Отключаем стандартные креды
+          fetch-depth: 0  # Полная история коммитов
 
       - name: Установка Python
         uses: actions/setup-python@v3
@@ -29,11 +30,18 @@ jobs:
 
       - name: Коммит и пуш изменений
         run: |
-          git config --global user.name "RichardMoor75"
-          git config --global user.email "rishat.murtazin@gmail.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add geosite.dat
-          git commit -m "Автообновление geosite.dat" || exit 0
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          
+          # Проверяем есть ли изменения перед коммитом
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Нет изменений для коммита"
+            exit 0
+          fi
+          
+          git commit -m "Автообновление geosite.dat"
+          git push
         env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        continue-on-error: true  # Игнорируем ошибки, если изменений нет
+          # Используем встроенный токен GitHub
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
