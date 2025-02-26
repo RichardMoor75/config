@@ -30,8 +30,8 @@ jobs:
 
       - name: Коммит и пуш изменений
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "RichardMoor75"
+          git config --global user.email "rishat.murtazin@gmail.com"
           git add geosite.dat
           
           # Проверяем есть ли изменения перед коммитом
