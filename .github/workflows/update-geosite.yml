@@ -36,7 +36,7 @@ jobs:
         run: |
           git add geosite.dat
           git commit -m "Автообновление geosite.dat" || exit 0
-         # git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
-      #  env:
-       #   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-      #  continue-on-error: true  # Игнорируем ошибки, если изменений нет
+          git push https://oauth2:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        continue-on-error: true  # Игнорируем ошибки, если изменений нет
