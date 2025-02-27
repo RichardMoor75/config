@@ -34,9 +34,12 @@ jobs:
 
     - name: Install geosite compiler
       run: |
-        go install github.com/v2fly/geosite@latest
-        $HOME/go/bin/geosite -h
+        git config --global url."git@github.com:".insteadOf "https://github.com/"
+        GOPRIVATE=github.com/v2fly/geosite go install github.com/v2fly/geosite@latest
+        $HOME/go/bin/geosite --version
         echo "$HOME/go/bin" >> $GITHUB_PATH
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run conversion script
       run: python geosite_converter.py
