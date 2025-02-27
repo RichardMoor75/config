@@ -19,7 +19,7 @@ jobs:
 
     - name: Download geosite binary
       run: |
-        wget https://github.com/v2fly/geosite/releases/download/20240502065737/geosite_linux_amd64
+        wget https://github.com/v2fly/geosite/releases/download/v0.0.1/geosite_linux_amd64
         chmod +x geosite_linux_amd64
         mkdir -p $HOME/go/bin
         mv geosite_linux_amd64 $HOME/go/bin/geosite
