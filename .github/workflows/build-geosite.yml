@@ -1,0 +1,55 @@
+name: Build and Commit Geosite
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyyaml requests
+        go install github.com/v2fly/v2ray-core/v4/infra/control/geosite@latest
+        echo "$HOME/go/bin" >> $GITHUB_PATH
+
+    - name: Run conversion script
+      run: python geosite_converter.py
+
+    - name: Commit and push geosite.dat
+      run: |
+        # Настройка git
+        git config --global user.name "RichardMoor75"
+        git config --global user.email "rishat.murtazin@gmail.com"
+
+        # Проверка изменений
+        if git diff --exit-code --quiet geosite.dat; then
+          echo "No changes to geosite.dat"
+          exit 0
+        fi
+
+        # Коммит и пуш
+        git add geosite.dat
+        git commit -m "Auto-update geosite.dat"
+        git push origin HEAD:main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
