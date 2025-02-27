@@ -17,18 +17,12 @@ jobs:
       with:
         persist-credentials: false
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-
-    - name: Clean Go cache
-      run: go clean -modcache
-
-    - name: Install geosite compiler
+    - name: Download geosite binary
       run: |
-        go install github.com/v2fly/geosite@v0.0.20240502065737-5a6a5b1d8c8b
-        $HOME/go/bin/geosite --version
+        wget https://github.com/v2fly/geosite/releases/download/20240502065737/geosite_linux_amd64
+        chmod +x geosite_linux_amd64
+        mkdir -p $HOME/go/bin
+        mv geosite_linux_amd64 $HOME/go/bin/geosite
         echo "$HOME/go/bin" >> $GITHUB_PATH
         
     - name: Set up Python
