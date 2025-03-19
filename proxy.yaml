@@ -1,0 +1,30 @@
+payload:
+  - GEOSITE,google-gemini
+  - GEOSITE,google-deepmind
+  - GEOSITE,google
+  - GEOSITE,google-play
+  - GEOSITE,google-registry
+  - GEOSITE,google-trust-services
+  - GEOIP,google
+
+  - GEOSITE,telegram
+  - GEOIP,telegram
+  - GEOSITE,whatsapp
+  - GEOSITE,instagram
+  - GEOSITE,youtube
+  - GEOSITE,trello
+  - GEOSITE,perplexity
+  - GEOSITE,openai
+  - GEOSITE,tiktok
+  - GEOSITE,facebook
+  - GEOIP,facebook
+  - GEOSITE,microsoft
+  - GEOSITE,discord
+  - GEOSITE,anthropic
+  - GEOSITE,twitter
+  - GEOIP,twitter
+  - GEOSITE,spotify
+  - GEOSITE,notion
+  - GEOSITE,github
+  - GEOSITE,bytedance
+  - GEOSITE,win-update
