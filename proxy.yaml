@@ -1,4 +1,11 @@
 payload:
+
+  - DOMAIN,remna.st
+  - DOMAIN-KEYWORD,lampa
+  - DOMAIN-KEYWORD,jacred
+  - DOMAIN-KEYWORD,yourok
+  - DOMAIN-KEYWORD,novayagazeta
+
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
   - GEOSITE,google
