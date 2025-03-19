@@ -1,4 +1,10 @@
 payload:
+  - GEOSITE,CN
+  - GEOIP,CN
+  - GEOIP,BY
+  - GEOIP,KZ
+  - GEOIP,RU
+
   # Программы торрент-клиентов
   - PROCESS-NAME,uTorrent.exe
   - PROCESS-NAME,BitTorrent.exe
