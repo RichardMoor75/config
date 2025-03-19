@@ -1,0 +1,42 @@
+payload:
+  # Программы торрент-клиентов
+  - PROCESS-NAME,uTorrent.exe
+  - PROCESS-NAME,BitTorrent.exe
+  - PROCESS-NAME,utweb.exe
+  - PROCESS-NAME,btweb.exe
+  - PROCESS-NAME,utorrentie.exe
+  - PROCESS-NAME,bittorrentie.exe
+  - PROCESS-NAME,qbittorrent.exe
+  - PROCESS-NAME,deluge.exe
+  - PROCESS-NAME,Azureus.exe
+  - PROCESS-NAME,tixati.exe
+  - PROCESS-NAME,transmission-qt.exe
+  - PROCESS-NAME,transmission-daemon.exe
+  - PROCESS-NAME,WebTorrent.exe
+  - PROCESS-NAME,PicoTorrent.exe
+  - PROCESS-NAME,FrostWire.exe
+  - PROCESS-NAME,Tribler.exe
+  - PROCESS-NAME,BitComet.exe
+  - PROCESS-NAME,mediaget.exe
+  - PROCESS-NAME,mediaget_crashpad_handler.exe
+  - PROCESS-NAME,uFiler.exe
+  - PROCESS-NAME,TorrServer-windows-386.exe
+  - PROCESS-NAME,TorrServer-windows-amd64.exe
+  - PROCESS-NAME,com.utorrent.client
+  - PROCESS-NAME,com.bittorrent.client
+  - PROCESS-NAME,com.delphicoder.flud
+  - PROCESS-NAME,org.proninyaroslav.libretorrent
+  - PROCESS-NAME,hu.tagsoft.ttorrent.pro
+  - PROCESS-NAME,com.mobilityflow.torrent
+  - PROCESS-NAME,com.intelligems.torrdroid
+  - PROCESS-NAME,com.frostwire.android
+  - PROCESS-NAME,com.vuze.android.remote
+  - PROCESS-NAME,com.biglybt.android.client
+  - PROCESS-NAME,player.torrserve # TorrServe Matrix
+  - PROCESS-NAME,YoutubeDownloader.exe
+  - PROCESS-NAME,kvpncgui.exe # Гулин ВПН для института
+
+  # Порты для торрент-клиентов
+  - DST-PORT,6881-6889
+  - DST-PORT,51413
+  - DST-PORT,12345
