@@ -4,6 +4,8 @@ payload:
   - GEOIP,BY
   - GEOIP,KZ
   - GEOIP,RU
+  - GEOSITE,category-gov-ru
+  - GEOSITE,category-ru
 
   # Программы торрент-клиентов
   - PROCESS-NAME,uTorrent.exe
