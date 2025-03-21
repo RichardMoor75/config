@@ -37,3 +37,4 @@ payload:
   - GEOSITE,win-update
   - GEOSITE,cloudflare
   - GEOIP,cloudflare
+  - GEOSITE,onedrive
