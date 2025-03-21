@@ -35,3 +35,5 @@ payload:
   - GEOSITE,github
   - GEOSITE,bytedance
   - GEOSITE,win-update
+  - GEOSITE,cloudflare
+  - GEOIP,cloudflare
