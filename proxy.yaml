@@ -5,6 +5,7 @@ payload:
   - DOMAIN-KEYWORD,jacred
   - DOMAIN-KEYWORD,yourok
   - DOMAIN-KEYWORD,novayagazeta
+  - DOMAIN-KEYWORD,hdrezka
 
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
