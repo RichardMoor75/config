@@ -8,6 +8,7 @@ payload:
   - DOMAIN-KEYWORD,hdrezka
   - DOMAIN-KEYWORD,richard-moor
   - DOMAIN-KEYWORD,andreybalta
+  - DOMAIN-KEYWORD,plex
 
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
