@@ -6,10 +6,10 @@ payload:
   - DOMAIN-KEYWORD,yourok
   - DOMAIN-KEYWORD,novayagazeta
   - DOMAIN-KEYWORD,hdrezka
-  - DOMAIN-KEYWORD,richard-moor
-  - DOMAIN-KEYWORD,andreybalta
-  - DOMAIN-KEYWORD,plex
-  - DOMAIN-KEYWORD,legiz
+#  - DOMAIN-KEYWORD,richard-moor
+#  - DOMAIN-KEYWORD,andreybalta
+#  - DOMAIN-KEYWORD,plex
+#  - DOMAIN-KEYWORD,legiz
 
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
