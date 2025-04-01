@@ -9,6 +9,7 @@ payload:
   - DOMAIN-KEYWORD,richard-moor
   - DOMAIN-KEYWORD,andreybalta
   - DOMAIN-KEYWORD,plex
+  - DOMAIN-KEYWORD,legiz
 
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
