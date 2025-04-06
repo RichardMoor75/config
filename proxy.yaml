@@ -4,7 +4,7 @@ payload:
   - DOMAIN-KEYWORD,lampa
   - DOMAIN-KEYWORD,jacred
   - DOMAIN-KEYWORD,yourok
-  - DOMAIN-KEYWORD,novayagazeta
+#  - DOMAIN-KEYWORD,novayagazeta
   - DOMAIN-KEYWORD,hdrezka
   - DOMAIN-KEYWORD,browserleaks
   - DOMAIN-KEYWORD,manus
@@ -16,14 +16,14 @@ payload:
   - GEOSITE,google-gemini
   - GEOSITE,google-deepmind
   - GEOSITE,google
-  - GEOSITE,google-play
-  - GEOSITE,google-registry
-  - GEOSITE,google-trust-services
+#  - GEOSITE,google-play
+#  - GEOSITE,google-registry
+#  - GEOSITE,google-trust-services
   - GEOIP,google
 
-  - GEOSITE,telegram
-  - GEOIP,telegram
-  - GEOSITE,whatsapp
+#  - GEOSITE,telegram
+#  - GEOIP,telegram
+#  - GEOSITE,whatsapp
   - GEOSITE,instagram
   - GEOSITE,youtube
   - GEOSITE,trello
