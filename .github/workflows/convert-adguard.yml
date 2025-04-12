@@ -11,10 +11,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          repository: 'zacred0rryn/srs-custom'
-          persist-credentials: false
-          fetch-depth: 0
 
       - name: Download and Set Up sing-box
         run: |
@@ -27,17 +23,17 @@ jobs:
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
-          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/common-sections/adservers.txt
-          
+          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_15_DnsFilter/filter.txt
+
       - name: Convert with sing-box
         run: |
           cd tmp/convert
           for file in *.txt; do
-            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard
+            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion failed for $file"; exit 1; }
           done
-          cd ../.. && rm -r binary/adguard && mkdir -p binary/adguard
+          cd ../.. && rm -rf binary/adguard && mkdir -p binary/adguard
           cp tmp/convert/*.srs binary/adguard/
-          rm -r tmp && ls -l binary/adguard
+          rm -rf tmp && ls -l binary/adguard
 
       - name: Configure Git
         run: |
@@ -46,7 +42,7 @@ jobs:
 
       - name: Check for Changes and Commit
         run: |
-          git add .
+          git add binary/adguard
           if git diff --cached --quiet; then
             echo "No changes detected, skipping commit."
             echo "changes=false" >> $GITHUB_ENV
@@ -57,7 +53,5 @@ jobs:
 
       - name: Push Changes
         if: env.changes == 'true'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+        run: |
+          git push origin HEAD:${{ github.ref_name }}
