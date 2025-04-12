@@ -3,7 +3,7 @@ name: Fetch and Convert AdGuard Type SRS
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * 0" 
+    - cron: "0 8 * * 0" # Каждое воскресенье в 8:00 утра по UTC
 
 jobs:
   main:
@@ -23,13 +23,19 @@ jobs:
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
-          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_15_DnsFilter/filter.txt
+          mkdir -p tmp/convert
+          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/common-sections/adservers.txt
+          if [ ! -f tmp/convert/AdGuardDNSFilter.txt ]; then
+            echo "Failed to download AdGuardDNSFilter.txt"
+            exit 1
+          fi
 
       - name: Convert with sing-box
         run: |
           cd tmp/convert
           for file in *.txt; do
-            ./sing-box rule-set convert \"$file\" --output \"${file%.txt}.srs\" --type adguard || { echo \"Conversion failed for $file\"; exit 1; }
+            echo "Converting $file..."
+            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion failed for $file"; exit 1; }
           done
           cd ../.. && rm -rf binary/adguard && mkdir -p binary/adguard
           cp tmp/convert/*.srs binary/adguard/
@@ -37,18 +43,18 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name \"RichardMoor75\"
-          git config --global user.email \"rishat.murtazin@gmail.com\"
+          git config --global user.name "RichardMoor75"
+          git config --global user.email "rishat.murtazin@gmail.com"
 
       - name: Check for Changes and Commit
         run: |
           git add binary/adguard
           if git diff --cached --quiet; then
-            echo \"No changes detected, skipping commit.\"
-            echo \"changes=false\" >> $GITHUB_ENV
+            echo "No changes detected, skipping commit."
+            echo "changes=false" >> $GITHUB_ENV
           else
-            git commit -m \"actions: Update adguard type srs\"
-            echo \"changes=true\" >> $GITHUB_ENV
+            git commit -m "actions: Update adguard type srs"
+            echo "changes=true" >> $GITHUB_ENV
           fi
 
       - name: Push Changes
