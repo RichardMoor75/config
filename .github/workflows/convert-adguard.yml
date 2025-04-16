@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and Set Up Tools
+      - name: Download and install Mihomo and sing-box
         run: |
           mkdir -p tmp/convert
           # sing-box
@@ -21,9 +21,13 @@ jobs:
           cp sing-box-1.10.0-alpha.25-linux-amd64/sing-box tmp/convert/
           chmod +x tmp/convert/sing-box
           rm -r sing-box-1.10.0-alpha.25-linux-amd64
-          # MetaCubeX rule-set generator
-          wget -O rule-set.tar.gz https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/rule-set-linux-amd64.tar.gz
-          tar zxvf rule-set.tar.gz rule-set && chmod +x rule-set && mv rule-set tmp/convert/ && rm rule-set.tar.gz
+          # Mihomo (Clash.Meta)
+          curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases \
+            | grep "browser_download_url.*mihomo-linux-amd64-alpha.*\.deb" \
+            | head -n 1 \
+            | cut -d '"' -f 4 \
+            | xargs wget -q -O mihomo-linux-amd64-alpha.deb
+          sudo apt install --fix-missing ./mihomo-linux-amd64-alpha.deb
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
@@ -33,15 +37,19 @@ jobs:
             exit 1
           fi
 
-      - name: Convert filters to SRS and MRS
+      - name: Convert filters to SRS and MRS using sing-box and Mihomo
         run: |
           cd tmp/convert
           for file in *.txt; do
-            echo "Converting $file to .srs..."
+            echo "Converting $file to .srs with sing-box..."
             ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
 
-            echo "Converting $file to .mrs..."
-            ./rule-set -i "$file" -o "${file%.txt}.mrs" -t adguard || { echo "Conversion to .mrs failed"; exit 1; }
+            echo "payload:" > temp.yaml
+            sed "s/.*/- '+.&'/" "$file" >> temp.yaml
+
+            echo "Converting $file to .mrs with Mihomo..."
+            mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
+            rm temp.yaml
           done
           cd ../..
           rm -rf binary/adguard && mkdir -p binary/adguard
