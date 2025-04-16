@@ -1,4 +1,4 @@
-name: Fetch and Convert AdGuard Type SRS
+name: Fetch and Convert AdGuard to SRS & MRS
 
 on:
   workflow_dispatch:
@@ -12,14 +12,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and Set Up sing-box
+      - name: Download and install Mihomo and sing-box
         run: |
           mkdir -p tmp/convert
+          # sing-box
           wget -O sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v1.10.0-alpha.25/sing-box-1.10.0-alpha.25-linux-amd64.tar.gz
           tar zxvf sing-box.tar.gz && rm sing-box.tar.gz
           cp sing-box-1.10.0-alpha.25-linux-amd64/sing-box tmp/convert/
           chmod +x tmp/convert/sing-box
           rm -r sing-box-1.10.0-alpha.25-linux-amd64
+          # Mihomo (Clash.Meta)
+          curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases \
+            | grep "browser_download_url.*mihomo-linux-amd64-alpha.*\\.deb" \
+            | head -n 1 \
+            | cut -d '"' -f 4 \
+            | xargs wget -q -O mihomo-linux-amd64-alpha.deb
+          sudo apt install --fix-missing ./mihomo-linux-amd64-alpha.deb
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
@@ -30,15 +38,23 @@ jobs:
             exit 1
           fi
 
-      - name: Convert with sing-box
+      - name: Convert to SRS and MRS
         run: |
           cd tmp/convert
           for file in *.txt; do
-            echo "Converting $file..."
-            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion failed for $file"; exit 1; }
+            echo "Converting $file to .srs..."
+            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
+
+            echo "Preparing $file to .mrs..."
+            echo "payload:" > temp.yaml
+            grep '^||' "$file" | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
+
+            mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
+            rm temp.yaml
           done
-          cd ../.. && rm -rf binary/adguard && mkdir -p binary/adguard
-          cp tmp/convert/*.srs binary/adguard/
+          cd ../..
+          rm -rf binary/adguard && mkdir -p binary/adguard
+          cp tmp/convert/*.srs tmp/convert/*.mrs binary/adguard/
           rm -rf tmp && ls -l binary/adguard
 
       - name: Configure Git
@@ -53,7 +69,7 @@ jobs:
             echo "No changes detected, skipping commit."
             echo "changes=false" >> $GITHUB_ENV
           else
-            git commit -m "actions: Update adguard type srs"
+            git commit -m "actions: Update adguard filters (srs & mrs)"
             echo "changes=true" >> $GITHUB_ENV
           fi
 
