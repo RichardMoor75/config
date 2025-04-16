@@ -1,4 +1,4 @@
-name: Fetch and Convert AdGuard to SRS & MRS
+name: Fetch and Convert AdGuard Type SRS
 
 on:
   workflow_dispatch:
@@ -12,48 +12,33 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and install Mihomo and sing-box
+      - name: Download and Set Up sing-box
         run: |
           mkdir -p tmp/convert
-          # sing-box
           wget -O sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v1.10.0-alpha.25/sing-box-1.10.0-alpha.25-linux-amd64.tar.gz
           tar zxvf sing-box.tar.gz && rm sing-box.tar.gz
           cp sing-box-1.10.0-alpha.25-linux-amd64/sing-box tmp/convert/
           chmod +x tmp/convert/sing-box
           rm -r sing-box-1.10.0-alpha.25-linux-amd64
-          # Mihomo (Clash.Meta)
-          curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases \
-            | grep "browser_download_url.*mihomo-linux-amd64-alpha.*\.deb" \
-            | head -n 1 \
-            | cut -d '"' -f 4 \
-            | xargs wget -q -O mihomo-linux-amd64-alpha.deb
-          sudo apt install --fix-missing ./mihomo-linux-amd64-alpha.deb
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
-          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_15_DnsFilter/filter.txt
+          mkdir -p tmp/convert
+          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/common-sections/adservers.txt
           if [ ! -f tmp/convert/AdGuardDNSFilter.txt ]; then
             echo "Failed to download AdGuardDNSFilter.txt"
             exit 1
           fi
 
-      - name: Convert filters to SRS and MRS using sing-box and Mihomo
+      - name: Convert with sing-box
         run: |
           cd tmp/convert
           for file in *.txt; do
-            echo "Converting $file to .srs with sing-box..."
-            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
-
-            echo "payload:" > temp.yaml
-            sed "s/.*/- '+.&'/" "$file" >> temp.yaml
-
-            echo "Converting $file to .mrs with Mihomo..."
-            mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
-            rm temp.yaml
+            echo "Converting $file..."
+            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion failed for $file"; exit 1; }
           done
-          cd ../..
-          rm -rf binary/adguard && mkdir -p binary/adguard
-          cp tmp/convert/*.srs tmp/convert/*.mrs binary/adguard/
+          cd ../.. && rm -rf binary/adguard && mkdir -p binary/adguard
+          cp tmp/convert/*.srs binary/adguard/
           rm -rf tmp && ls -l binary/adguard
 
       - name: Configure Git
@@ -68,7 +53,7 @@ jobs:
             echo "No changes detected, skipping commit."
             echo "changes=false" >> $GITHUB_ENV
           else
-            git commit -m "actions: Update AdGuard filters (srs & mrs)"
+            git commit -m "actions: Update adguard type srs"
             echo "changes=true" >> $GITHUB_ENV
           fi
 
