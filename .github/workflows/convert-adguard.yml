@@ -1,4 +1,4 @@
-name: Fetch and Convert AdGuard Type SRS
+name: Fetch and Convert AdGuard to SRS & MRS
 
 on:
   workflow_dispatch:
@@ -12,33 +12,40 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and Set Up sing-box
+      - name: Download and Set Up Tools
         run: |
           mkdir -p tmp/convert
+          # sing-box
           wget -O sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v1.10.0-alpha.25/sing-box-1.10.0-alpha.25-linux-amd64.tar.gz
           tar zxvf sing-box.tar.gz && rm sing-box.tar.gz
           cp sing-box-1.10.0-alpha.25-linux-amd64/sing-box tmp/convert/
           chmod +x tmp/convert/sing-box
           rm -r sing-box-1.10.0-alpha.25-linux-amd64
+          # MetaCubeX rule-set generator
+          wget -O rule-set.tar.gz https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/rule-set-linux-amd64.tar.gz
+          tar zxvf rule-set.tar.gz rule-set && chmod +x rule-set && mv rule-set tmp/convert/ && rm rule-set.tar.gz
 
       - name: Fetch AdGuard DNS Filter Lists
         run: |
-          mkdir -p tmp/convert
-          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/common-sections/adservers.txt
+          wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_15_DnsFilter/filter.txt
           if [ ! -f tmp/convert/AdGuardDNSFilter.txt ]; then
             echo "Failed to download AdGuardDNSFilter.txt"
             exit 1
           fi
 
-      - name: Convert with sing-box
+      - name: Convert filters to SRS and MRS
         run: |
           cd tmp/convert
           for file in *.txt; do
-            echo "Converting $file..."
-            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion failed for $file"; exit 1; }
+            echo "Converting $file to .srs..."
+            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
+
+            echo "Converting $file to .mrs..."
+            ./rule-set -i "$file" -o "${file%.txt}.mrs" -t adguard || { echo "Conversion to .mrs failed"; exit 1; }
           done
-          cd ../.. && rm -rf binary/adguard && mkdir -p binary/adguard
-          cp tmp/convert/*.srs binary/adguard/
+          cd ../..
+          rm -rf binary/adguard && mkdir -p binary/adguard
+          cp tmp/convert/*.srs tmp/convert/*.mrs binary/adguard/
           rm -rf tmp && ls -l binary/adguard
 
       - name: Configure Git
@@ -53,7 +60,7 @@ jobs:
             echo "No changes detected, skipping commit."
             echo "changes=false" >> $GITHUB_ENV
           else
-            git commit -m "actions: Update adguard type srs"
+            git commit -m "actions: Update AdGuard filters (srs & mrs)"
             echo "changes=true" >> $GITHUB_ENV
           fi
 
