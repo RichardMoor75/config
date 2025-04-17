@@ -1,4 +1,4 @@
-name: Fetch and Convert AdGuard to SRS & MRS
+name: Fetch and Convert AdGuard and RUAdList to SRS & MRS
 
 on:
   workflow_dispatch:
@@ -29,12 +29,13 @@ jobs:
             | xargs wget -q -O mihomo-linux-amd64-alpha.deb
           sudo apt install --fix-missing ./mihomo-linux-amd64-alpha.deb
 
-      - name: Fetch AdGuard DNS Filter Lists
+      - name: Fetch AdGuard and RUAdList DNS Filter Lists
         run: |
           mkdir -p tmp/convert
           wget -O tmp/convert/AdGuardDNSFilter.txt https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/common-sections/adservers.txt
-          if [ ! -f tmp/convert/AdGuardDNSFilter.txt ]; then
-            echo "Failed to download AdGuardDNSFilter.txt"
+          wget -O tmp/convert/RUAdList.txt https://easylist-downloads.adblockplus.org/ruadlist.txt
+          if [ ! -f tmp/convert/AdGuardDNSFilter.txt ] || [ ! -f tmp/convert/RUAdList.txt ]; then
+            echo "Failed to download filter files"
             exit 1
           fi
 
@@ -47,10 +48,17 @@ jobs:
 
             echo "Preparing $file to .mrs..."
             echo "payload:" > temp.yaml
-            grep '^||' "$file" | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
+            grep '^||' "$file" \
+              | grep -v '[*/?$]' \
+              | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
 
-            mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
-            rm temp.yaml
+            if [ -s temp.yaml ]; then
+              mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
+            else
+              echo "No valid domains to convert to .mrs in $file."
+            fi
+
+            rm -f temp.yaml
           done
           cd ../..
           rm -rf binary/adguard && mkdir -p binary/adguard
@@ -69,7 +77,7 @@ jobs:
             echo "No changes detected, skipping commit."
             echo "changes=false" >> $GITHUB_ENV
           else
-            git commit -m "actions: Update adguard filters (srs & mrs)"
+            git commit -m "actions: Update AdGuard and RUAdList filters (srs & mrs)"
             echo "changes=true" >> $GITHUB_ENV
           fi
 
