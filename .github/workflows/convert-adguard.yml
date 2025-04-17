@@ -42,24 +42,36 @@ jobs:
       - name: Convert to SRS and MRS
         run: |
           cd tmp/convert
-          for file in *.txt; do
-            echo "Converting $file to .srs..."
-            ./sing-box rule-set convert "$file" --output "${file%.txt}.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
 
-            echo "Preparing $file to .mrs..."
-            echo "payload:" > temp.yaml
-            grep '^||' "$file" \
-              | grep -v '[*/?$]' \
-              | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
+          echo "Converting AdGuardDNSFilter.txt to .srs..."
+          ./sing-box rule-set convert "AdGuardDNSFilter.txt" --output "AdGuardDNSFilter.srs" --type adguard || { echo "Conversion to .srs failed"; exit 1; }
 
-            if [ -s temp.yaml ]; then
-              mihomo convert-ruleset domain yaml temp.yaml "${file%.txt}.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
-            else
-              echo "No valid domains to convert to .mrs in $file."
-            fi
+          echo "Preparing AdGuardDNSFilter.txt to .mrs..."
+          echo "payload:" > temp.yaml
+          grep '^||' "AdGuardDNSFilter.txt" \
+            | grep -v '[*/?$]' \
+            | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
 
-            rm -f temp.yaml
-          done
+          if [ -s temp.yaml ]; then
+            mihomo convert-ruleset domain yaml temp.yaml "AdGuardDNSFilter.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
+          else
+            echo "No valid domains to convert to .mrs in AdGuardDNSFilter.txt."
+          fi
+          rm -f temp.yaml
+
+          echo "Preparing RUAdList.txt to .mrs..."
+          echo "payload:" > temp.yaml
+          grep '^||' "RUAdList.txt" \
+            | grep -v '[*/?$]' \
+            | sed 's/^||//; s/\^.*$//; s/^/- "+./; s/$/"/' >> temp.yaml
+
+          if [ -s temp.yaml ]; then
+            mihomo convert-ruleset domain yaml temp.yaml "RUAdList.mrs" || { echo "Conversion to .mrs failed"; exit 1; }
+          else
+            echo "No valid domains to convert to .mrs in RUAdList.txt."
+          fi
+          rm -f temp.yaml
+
           cd ../..
           rm -rf binary/adguard && mkdir -p binary/adguard
           cp tmp/convert/*.srs tmp/convert/*.mrs binary/adguard/
