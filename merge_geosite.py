@@ -8,15 +8,20 @@ def read_geosite(file_path):
     return db
 
 def merge_geosites(original, custom):
-    seen = set()
-    for site in original.entry:
-        seen.update((d.type, d.value) for d in site.domain)
+    existing_category_codes = {site.country_code for site in original.entry}
 
     for site in custom.entry:
-        for d in site.domain:
-            if (d.type, d.value) not in seen:
-                original.entry[0].domain.append(d)
-                seen.add((d.type, d.value))
+        if site.country_code not in existing_category_codes:
+            original.entry.append(site)
+            existing_category_codes.add(site.country_code)
+        else:
+            # Если категория уже есть, то можно объединять домены
+            target_site = next(s for s in original.entry if s.country_code == site.country_code)
+            existing_domains = set((d.type, d.value) for d in target_site.domain)
+            for d in site.domain:
+                if (d.type, d.value) not in existing_domains:
+                    target_site.domain.append(d)
+                    existing_domains.add((d.type, d.value))
 
 def write_geosite(db, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
