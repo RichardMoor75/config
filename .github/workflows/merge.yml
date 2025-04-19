@@ -26,6 +26,9 @@ jobs:
     - name: Download custom geosite.dat
       run: curl -L -o custom_geosite.dat https://github.com/1andrevich/antifilter-domain/releases/latest/download/geosite.dat
 
+    - name: Create target folder
+      run: mkdir -p config/binary/geosite
+
     - name: Merge geosite files
       run: |
         python merge_geosite.py
