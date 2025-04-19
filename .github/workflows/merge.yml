@@ -15,7 +15,9 @@ jobs:
 
     - name: Install sing-box
       run: |
-        wget https://github.com/SagerNet/sing-box/releases/latest/download/sing-box-linux-amd64 -O sing-box
+        LATEST_URL=$(curl -sL https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep "browser_download_url" | grep "linux-amd64.tar.gz" | cut -d '"' -f 4)
+        wget $LATEST_URL -O sing-box.tar.gz
+        tar -xzf sing-box.tar.gz
         chmod +x sing-box
 
     - name: Download original geosite.dat
