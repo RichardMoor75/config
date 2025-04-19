@@ -43,4 +43,4 @@ jobs:
     - name: Commit and push changes if any
       if: success() || failure()
       run: |
-        git diff --cached --quiet || (git commit -m "Update merged geosite.dat" && git push)
+        git diff --cached --quiet || (git commit -m "Update merged geosite.dat" && git pull --rebase && git push)
