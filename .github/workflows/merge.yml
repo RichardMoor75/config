@@ -1,0 +1,48 @@
+name: Merge and Upload Geosite Files
+
+on:
+  workflow_dispatch:  # ручной запуск через кнопку в GitHub Actions
+  schedule:
+    - cron: '0 3 * * *'  # автоматический запуск каждый день в 3:00 по UTC (можно убрать если не нужно)
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout your repository
+      uses: actions/checkout@v4
+
+    - name: Install v2dat tool
+      run: |
+        wget https://github.com/IrineSistiana/v2dat/releases/latest/download/v2dat-linux-amd64.zip
+        unzip v2dat-linux-amd64.zip
+        chmod +x v2dat
+
+    - name: Download original geosite.dat
+      run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+
+    - name: Download custom geosite.dat
+      run: curl -L -o custom_geosite.dat https://github.com/1andrevich/antifilter-domain/releases/latest/download/geosite.dat
+
+    - name: Decode both geosite files
+      run: |
+        mkdir decoded
+        ./v2dat decode original_geosite.dat decoded/original
+        ./v2dat decode custom_geosite.dat decoded/custom
+
+    - name: Merge decoded folders
+      run: |
+        cp -r decoded/custom/* decoded/original/
+
+    - name: Encode merged geosite.dat
+      run: |
+        ./v2dat encode decoded/original config/binary/geosite/geosite.dat
+
+    - name: Commit and push changes
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add config/binary/geosite/geosite.dat
+        git commit -m "Update merged geosite.dat"
+        git push
