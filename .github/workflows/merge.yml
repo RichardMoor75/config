@@ -13,15 +13,11 @@ jobs:
     - name: Checkout your repository
       uses: actions/checkout@v4
 
-    - name: Install sing-box
+    - name: Install geoip-tool
       run: |
-        LATEST_URL=$(curl -sL https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep "browser_download_url" | grep "linux-amd64.tar.gz" | cut -d '"' -f 4)
-        wget $LATEST_URL -O sing-box.tar.gz
-        tar -xzf sing-box.tar.gz
-        cd sing-box-*-linux-amd64
-        mv sing-box ../sing-box
-        cd ..
-        chmod +x sing-box
+        wget https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/geoip-tool-linux-amd64
+        chmod +x geoip-tool-linux-amd64
+        mv geoip-tool-linux-amd64 geoip-tool
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
@@ -32,8 +28,8 @@ jobs:
     - name: Decode both geosite files
       run: |
         mkdir -p decoded/original decoded/custom
-        ./sing-box geosite export -f original_geosite.dat -o decoded/original
-        ./sing-box geosite export -f custom_geosite.dat -o decoded/custom
+        ./geoip-tool decode -i original_geosite.dat -o decoded/original
+        ./geoip-tool decode -i custom_geosite.dat -o decoded/custom
 
     - name: Merge decoded folders
       run: |
@@ -41,7 +37,7 @@ jobs:
 
     - name: Encode merged geosite.dat
       run: |
-        ./sing-box geosite compile -D decoded/original -o config/binary/geosite/geosite.dat
+        ./geoip-tool encode -i decoded/original -o config/binary/geosite/geosite.dat
 
     - name: Check if there are changes
       run: |
