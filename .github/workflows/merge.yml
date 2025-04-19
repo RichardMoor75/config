@@ -13,11 +13,11 @@ jobs:
     - name: Checkout your repository
       uses: actions/checkout@v4
 
-    - name: Install v2dat tool
+    - name: Install geo-tool
       run: |
-        wget https://github.com/IrineSistiana/v2dat/releases/latest/download/v2dat.zip
-        unzip v2dat.zip
-        chmod +x v2dat
+        wget https://github.com/MetaCubeX/mihomo/releases/latest/download/geo-tool-linux-amd64
+        chmod +x geo-tool-linux-amd64
+        mv geo-tool-linux-amd64 geo-tool
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
@@ -27,9 +27,9 @@ jobs:
 
     - name: Decode both geosite files
       run: |
-        mkdir decoded
-        ./v2dat decode original_geosite.dat decoded/original
-        ./v2dat decode custom_geosite.dat decoded/custom
+        mkdir decoded/original decoded/custom
+        ./geo-tool decode --format domainlist original_geosite.dat decoded/original
+        ./geo-tool decode --format domainlist custom_geosite.dat decoded/custom
 
     - name: Merge decoded folders
       run: |
@@ -37,7 +37,7 @@ jobs:
 
     - name: Encode merged geosite.dat
       run: |
-        ./v2dat encode decoded/original config/binary/geosite/geosite.dat
+        ./geo-tool encode --format domainlist decoded/original config/binary/geosite/geosite.dat
 
     - name: Check if there are changes
       run: |
