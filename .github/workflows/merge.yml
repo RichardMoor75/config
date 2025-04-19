@@ -13,11 +13,17 @@ jobs:
     - name: Checkout your repository
       uses: actions/checkout@v4
 
-    - name: Install geoip-tool
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Build geoip-tool
       run: |
-        wget https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/geoip-tool-linux-amd64
-        chmod +x geoip-tool-linux-amd64
-        mv geoip-tool-linux-amd64 geoip-tool
+        git clone https://github.com/MetaCubeX/meta-rules-dat.git
+        cd meta-rules-dat/tools/geoip-tool
+        go build -o ../../../geoip-tool
+        cd ../../../
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
