@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package v2ray.core.app.router.geosite;
+
+message GeoSiteList {
+  repeated GeoSite entry = 1;
+}
+
+message GeoSite {
+  string country_code = 1;
+  repeated Domain domain = 2;
+}
+
+message Domain {
+  enum Type {
+    Plain = 0;
+    Regex = 1;
+    Subdomain = 2;
+    Keyword = 3;
+    Full = 4;
+  }
+  Type type = 1;
+  string value = 2;
+}
