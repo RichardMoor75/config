@@ -32,8 +32,8 @@ jobs:
     - name: Decode both geosite files
       run: |
         mkdir -p decoded/original decoded/custom
-        ./sing-box geo export-geosite --input original_geosite.dat --output decoded/original
-        ./sing-box geo export-geosite --input custom_geosite.dat --output decoded/custom
+        ./sing-box geosite export --input original_geosite.dat --output decoded/original
+        ./sing-box geosite export --input custom_geosite.dat --output decoded/custom
 
     - name: Merge decoded folders
       run: |
@@ -41,7 +41,7 @@ jobs:
 
     - name: Encode merged geosite.dat
       run: |
-        ./sing-box geo compile-geosite --input decoded/original --output config/binary/geosite/geosite.dat
+        ./sing-box geosite compile --input decoded/original --output config/binary/geosite/geosite.dat
 
     - name: Check if there are changes
       run: |
