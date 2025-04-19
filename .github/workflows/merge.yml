@@ -20,10 +20,10 @@ jobs:
 
     - name: Build geoip-tool
       run: |
-        git clone https://github.com/MetaCubeX/meta-rules-dat.git
-        cd meta-rules-dat/tools/geoip-tool
-        go build -o ../../../geoip-tool
-        cd ../../../
+        git clone https://github.com/MetaCubeX/geoip.git
+        cd geoip/tool
+        go build -o ../../geoip-tool
+        cd ../../
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
