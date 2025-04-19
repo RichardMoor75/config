@@ -7,21 +7,17 @@ def read_geosite(file_path):
         db.ParseFromString(f.read())
     return db
 
-def merge_geosites(original, custom):
-    existing_category_codes = {site.country_code for site in original.entry}
-
+def create_antifilter_category(custom):
+    new_site = geosite_pb2.GeoSite()
+    new_site.country_code = "antifilter-community"
     for site in custom.entry:
-        if site.country_code not in existing_category_codes:
-            original.entry.append(site)
-            existing_category_codes.add(site.country_code)
-        else:
-            # Если категория уже есть, то можно объединять домены
-            target_site = next(s for s in original.entry if s.country_code == site.country_code)
-            existing_domains = set((d.type, d.value) for d in target_site.domain)
-            for d in site.domain:
-                if (d.type, d.value) not in existing_domains:
-                    target_site.domain.append(d)
-                    existing_domains.add((d.type, d.value))
+        for d in site.domain:
+            new_site.domain.append(d)
+    return new_site
+
+def merge_geosites(original, custom):
+    antifilter_site = create_antifilter_category(custom)
+    original.entry.append(antifilter_site)
 
 def write_geosite(db, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
