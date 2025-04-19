@@ -10,9 +10,13 @@ def read_geosite(file_path):
 def create_antifilter_category(custom):
     new_site = geosite_pb2.GeoSite()
     new_site.country_code = "antifilter-community"
+    
     for site in custom.entry:
         for d in site.domain:
-            new_site.domain.append(d)
+            domain = new_site.domain.add()
+            domain.type = d.type
+            domain.value = d.value
+
     return new_site
 
 def merge_geosites(original, custom):
