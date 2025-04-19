@@ -13,17 +13,13 @@ jobs:
     - name: Checkout your repository
       uses: actions/checkout@v4
 
-    - name: Install Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
-
-    - name: Build geoip-tool
+    - name: Install Python and Protobuf
       run: |
-        git clone https://github.com/MetaCubeX/geoip.git
-        cd geoip/tool
-        go build -o ../../geoip-tool
-        cd ../../
+        sudo apt update
+        sudo apt install -y protobuf-compiler
+        pip install protobuf
+        curl -O https://raw.githubusercontent.com/v2fly/domain-list-community/master/geosite.proto
+        protoc --python_out=. geosite.proto
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
@@ -31,19 +27,9 @@ jobs:
     - name: Download custom geosite.dat
       run: curl -L -o custom_geosite.dat https://github.com/1andrevich/antifilter-domain/releases/latest/download/geosite.dat
 
-    - name: Decode both geosite files
+    - name: Merge geosite files
       run: |
-        mkdir -p decoded/original decoded/custom
-        ./geoip-tool decode -i original_geosite.dat -o decoded/original
-        ./geoip-tool decode -i custom_geosite.dat -o decoded/custom
-
-    - name: Merge decoded folders
-      run: |
-        cp -r decoded/custom/* decoded/original/
-
-    - name: Encode merged geosite.dat
-      run: |
-        ./geoip-tool encode -i decoded/original -o config/binary/geosite/geosite.dat
+        python merge_geosite.py
 
     - name: Check if there are changes
       run: |
