@@ -15,9 +15,9 @@ jobs:
 
     - name: Install geo-tool
       run: |
-        wget https://github.com/MetaCubeX/mihomo/releases/latest/download/geo-tool-linux-amd64
-        chmod +x geo-tool-linux-amd64
-        mv geo-tool-linux-amd64 geo-tool
+        wget https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-amd64.zip
+        unzip mihomo-linux-amd64.zip
+        chmod +x geo-tool
 
     - name: Download original geosite.dat
       run: curl -L -o original_geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
